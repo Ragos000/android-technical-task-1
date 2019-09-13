@@ -68,10 +68,15 @@ class LoginActivity : AppCompatActivity() {
             til_password.error = getString(R.string.password_error)
         }
 
-        if (Pattern.matches(NAME_REGEX, et_password.text.toString())) {
+        if (et_name.text.toString() == "") {
+            til_name.error = ""
+            return allValid
+        }
+
+        if (Pattern.matches(NAME_REGEX, et_name.text.toString())) {
             allValid = true
         } else {
-            til_email.error = getString(R.string.full_name_error)
+            til_name.error = getString(R.string.full_name_error)
         }
 
         return allValid
