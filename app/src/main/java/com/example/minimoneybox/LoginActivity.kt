@@ -54,29 +54,28 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun allFieldsValid() : Boolean {
-        var allValid = false
+        var allValid = true
+        til_email.error = ""
+        til_password.error = ""
+        til_name.error = ""
 
-        if (Pattern.matches(EMAIL_REGEX, et_email.text.toString())) {
-            allValid = true
-        } else {
+        if (!Pattern.matches(EMAIL_REGEX, et_email.text.toString())) {
             til_email.error = getString(R.string.email_address_error)
+            allValid = false
         }
 
-        if (Pattern.matches(PASSWORD_REGEX, et_password.text.toString())) {
-            allValid = true
-        } else {
+        if (!Pattern.matches(PASSWORD_REGEX, et_password.text.toString())) {
             til_password.error = getString(R.string.password_error)
+            allValid = false
         }
 
         if (et_name.text.toString() == "") {
-            til_name.error = ""
             return allValid
         }
 
-        if (Pattern.matches(NAME_REGEX, et_name.text.toString())) {
-            allValid = true
-        } else {
+        if (!Pattern.matches(NAME_REGEX, et_name.text.toString())) {
             til_name.error = getString(R.string.full_name_error)
+            allValid = false
         }
 
         return allValid
