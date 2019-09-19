@@ -2,12 +2,15 @@ package com.example.minimoneybox
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
+import com.example.minimoneybox.api.NetworkLayer
+import com.example.minimoneybox.fragments.UserAccountsFragment
 import java.util.regex.Pattern
 
 /**
@@ -23,10 +26,12 @@ class LoginActivity : AppCompatActivity() {
     lateinit var til_name : TextInputLayout
     lateinit var et_name : EditText
     lateinit var pigAnimation : LottieAnimationView
+    lateinit var userPlanFragment: UserAccountsFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        NetworkLayer.setUp(applicationContext)
         setupViews()
     }
 
@@ -48,10 +53,29 @@ class LoginActivity : AppCompatActivity() {
         btn_sign_in.setOnClickListener {
             if (allFieldsValid()) {
                 Toast.makeText(this, R.string.input_valid, Toast.LENGTH_LONG).show()
+                login(et_email.text.toString(), et_password.text.toString())
             }
         }
+    }
 
+    private fun login(email: String, password: String){
+        NetworkLayer.loginApiCall(email, password, ::getInvestorProducts)
+    }
 
+    private fun getInvestorProducts(){
+        NetworkLayer.getInvestorProductsApiCall {
+            userPlanFragment = UserAccountsFragment()
+            addFragment(userPlanFragment)
+        }
+    }
+
+    fun addFragment(fragment: Fragment) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        fragmentTransaction.add(R.id.fragment_container, fragment)
+        fragmentTransaction.addToBackStack(fragment.javaClass.simpleName)
+        fragmentTransaction.commit()
     }
 
     private fun allFieldsValid() : Boolean {
@@ -83,17 +107,25 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupAnimation() {
-        pigAnimation.setMinAndMaxFrame(0, 109)
+        pigAnimation.setMinAndMaxFrame(firstAnim.first, firstAnim.second)
         pigAnimation.playAnimation()
         pigAnimation.addAnimatorUpdateListener { valueAnimator ->
 
             if (valueAnimator.animatedFraction.toInt() == 1){
-                pigAnimation.setMinAndMaxFrame(131, 158)
+                pigAnimation.setMinAndMaxFrame(secondAnim.first, secondAnim.second)
                 pigAnimation.repeatCount = LottieDrawable.INFINITE
                 pigAnimation.repeatMode = LottieDrawable.RESTART
                 pigAnimation.playAnimation()
             }
          }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        getInvestorProducts()
+        if (userPlanFragment != null)
+        userPlanFragment.updateAdapter()
+
     }
 
     companion object {
